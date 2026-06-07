@@ -14,16 +14,248 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      cities: {
+        Row: {
+          country_code: string
+          id: string
+          name: string
+        }
+        Insert: {
+          country_code: string
+          id?: string
+          name: string
+        }
+        Update: {
+          country_code?: string
+          id?: string
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cities_country_code_fkey"
+            columns: ["country_code"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      countries: {
+        Row: {
+          code: string
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          code: string
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          code?: string
+          name?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      leads: {
+        Row: {
+          assigned_to: string | null
+          business_name: string
+          city_id: string | null
+          country_code: string | null
+          created_at: string
+          created_by: string
+          email: string | null
+          gbp_url: string | null
+          id: string
+          lead_source: string | null
+          niche_slug: string | null
+          notes: string | null
+          owner_name: string | null
+          phone: string | null
+          status: Database["public"]["Enums"]["lead_status"]
+          updated_at: string
+          website_score: number | null
+          website_url: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          business_name: string
+          city_id?: string | null
+          country_code?: string | null
+          created_at?: string
+          created_by: string
+          email?: string | null
+          gbp_url?: string | null
+          id?: string
+          lead_source?: string | null
+          niche_slug?: string | null
+          notes?: string | null
+          owner_name?: string | null
+          phone?: string | null
+          status?: Database["public"]["Enums"]["lead_status"]
+          updated_at?: string
+          website_score?: number | null
+          website_url?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          business_name?: string
+          city_id?: string | null
+          country_code?: string | null
+          created_at?: string
+          created_by?: string
+          email?: string | null
+          gbp_url?: string | null
+          id?: string
+          lead_source?: string | null
+          niche_slug?: string | null
+          notes?: string | null
+          owner_name?: string | null
+          phone?: string | null
+          status?: Database["public"]["Enums"]["lead_status"]
+          updated_at?: string
+          website_score?: number | null
+          website_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_country_code_fkey"
+            columns: ["country_code"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "leads_niche_slug_fkey"
+            columns: ["niche_slug"]
+            isOneToOne: false
+            referencedRelation: "niches"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
+      niches: {
+        Row: {
+          name: string
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          name: string
+          slug: string
+          sort_order?: number
+        }
+        Update: {
+          name?: string
+          slug?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
+      search_history: {
+        Row: {
+          city_id: string | null
+          created_at: string
+          id: string
+          niche_slug: string | null
+          query: string
+          user_id: string
+        }
+        Insert: {
+          city_id?: string | null
+          created_at?: string
+          id?: string
+          niche_slug?: string | null
+          query: string
+          user_id: string
+        }
+        Update: {
+          city_id?: string | null
+          created_at?: string
+          id?: string
+          niche_slug?: string | null
+          query?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "member"
+      lead_status:
+        | "new"
+        | "audit_done"
+        | "email_sent"
+        | "followup_1"
+        | "followup_2"
+        | "replied"
+        | "meeting"
+        | "proposal"
+        | "closed_won"
+        | "closed_lost"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +382,20 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "member"],
+      lead_status: [
+        "new",
+        "audit_done",
+        "email_sent",
+        "followup_1",
+        "followup_2",
+        "replied",
+        "meeting",
+        "proposal",
+        "closed_won",
+        "closed_lost",
+      ],
+    },
   },
 } as const
