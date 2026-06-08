@@ -34,7 +34,13 @@ function LeadsPage() {
   const [search, setSearch] = useState("");
   const [filterNiche, setFilterNiche] = useState<string>("all");
   const [filterCountry, setFilterCountry] = useState<string>("all");
+  const [scope, setScope] = useState<"mine" | "team">("mine");
   const [open, setOpen] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
+  }, []);
 
   const { data: niches = [] } = useQuery({ queryKey: ["niches"], queryFn: async () => (await supabase.from("niches").select("*").order("sort_order")).data ?? [] });
   const { data: countries = [] } = useQuery({ queryKey: ["countries"], queryFn: async () => (await supabase.from("countries").select("*").order("sort_order")).data ?? [] });
@@ -45,10 +51,11 @@ function LeadsPage() {
   });
 
   const filtered = useMemo(() => leads.filter((l) =>
+    (scope === "team" || !userId || l.created_by === userId || l.assigned_to === userId) &&
     (filterNiche === "all" || l.niche_slug === filterNiche) &&
     (filterCountry === "all" || l.country_code === filterCountry) &&
     (search === "" || l.business_name.toLowerCase().includes(search.toLowerCase()))
-  ), [leads, search, filterNiche, filterCountry]);
+  ), [leads, search, filterNiche, filterCountry, scope, userId]);
 
   const grouped = useMemo(() => {
     const g: Record<string, typeof leads> = Object.fromEntries(STATUSES.map((s) => [s.key, []]));
