@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
-import { Plus, Search, Trash2 } from "lucide-react";
+import { Plus, Search, Trash2, UserRound, UsersRound } from "lucide-react";
 import { toast } from "sonner";
 
 const STATUSES = [
@@ -34,7 +34,13 @@ function LeadsPage() {
   const [search, setSearch] = useState("");
   const [filterNiche, setFilterNiche] = useState<string>("all");
   const [filterCountry, setFilterCountry] = useState<string>("all");
+  const [scope, setScope] = useState<"mine" | "team">("mine");
   const [open, setOpen] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
+  }, []);
 
   const { data: niches = [] } = useQuery({ queryKey: ["niches"], queryFn: async () => (await supabase.from("niches").select("*").order("sort_order")).data ?? [] });
   const { data: countries = [] } = useQuery({ queryKey: ["countries"], queryFn: async () => (await supabase.from("countries").select("*").order("sort_order")).data ?? [] });
@@ -45,10 +51,11 @@ function LeadsPage() {
   });
 
   const filtered = useMemo(() => leads.filter((l) =>
+    (scope === "team" || !userId || l.created_by === userId || l.assigned_to === userId) &&
     (filterNiche === "all" || l.niche_slug === filterNiche) &&
     (filterCountry === "all" || l.country_code === filterCountry) &&
     (search === "" || l.business_name.toLowerCase().includes(search.toLowerCase()))
-  ), [leads, search, filterNiche, filterCountry]);
+  ), [leads, search, filterNiche, filterCountry, scope, userId]);
 
   const grouped = useMemo(() => {
     const g: Record<string, typeof leads> = Object.fromEntries(STATUSES.map((s) => [s.key, []]));
@@ -85,6 +92,14 @@ function LeadsPage() {
       />
       <div className="p-6 pt-4 space-y-4">
         <div className="flex flex-wrap gap-2 items-center">
+          <div className="inline-flex rounded-lg border border-border bg-card p-0.5">
+            <Button size="sm" variant={scope === "mine" ? "default" : "ghost"} className="h-8 gap-1.5" onClick={() => setScope("mine")}>
+              <UserRound className="size-3.5" /> Mine
+            </Button>
+            <Button size="sm" variant={scope === "team" ? "default" : "ghost"} className="h-8 gap-1.5" onClick={() => setScope("team")}>
+              <UsersRound className="size-3.5" /> Team
+            </Button>
+          </div>
           <div className="relative flex-1 min-w-64">
             <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <Input placeholder="Search business name…" className="pl-9" value={search} onChange={(e) => setSearch(e.target.value)} />
