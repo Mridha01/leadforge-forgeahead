@@ -92,6 +92,14 @@ function LeadsPage() {
       />
       <div className="p-6 pt-4 space-y-4">
         <div className="flex flex-wrap gap-2 items-center">
+          <div className="inline-flex rounded-lg border border-border bg-card p-0.5">
+            <Button size="sm" variant={scope === "mine" ? "default" : "ghost"} className="h-8 gap-1.5" onClick={() => setScope("mine")}>
+              <UserRound className="size-3.5" /> Mine
+            </Button>
+            <Button size="sm" variant={scope === "team" ? "default" : "ghost"} className="h-8 gap-1.5" onClick={() => setScope("team")}>
+              <UsersRound className="size-3.5" /> Team
+            </Button>
+          </div>
           <div className="relative flex-1 min-w-64">
             <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <Input placeholder="Search business name…" className="pl-9" value={search} onChange={(e) => setSearch(e.target.value)} />
