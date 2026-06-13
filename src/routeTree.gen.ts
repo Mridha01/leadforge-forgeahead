@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedTeamRouteImport } from './routes/_authenticated/team'
 import { Route as AuthenticatedProspectingRouteImport } from './routes/_authenticated/prospecting'
 import { Route as AuthenticatedLeadsRouteImport } from './routes/_authenticated/leads'
+import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated/finance'
 import { Route as AuthenticatedFbOutreachRouteImport } from './routes/_authenticated/fb-outreach'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 
@@ -48,6 +49,11 @@ const AuthenticatedLeadsRoute = AuthenticatedLeadsRouteImport.update({
   path: '/leads',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedFinanceRoute = AuthenticatedFinanceRouteImport.update({
+  id: '/finance',
+  path: '/finance',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedFbOutreachRoute = AuthenticatedFbOutreachRouteImport.update({
   id: '/fb-outreach',
   path: '/fb-outreach',
@@ -64,6 +70,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/fb-outreach': typeof AuthenticatedFbOutreachRoute
+  '/finance': typeof AuthenticatedFinanceRoute
   '/leads': typeof AuthenticatedLeadsRoute
   '/prospecting': typeof AuthenticatedProspectingRoute
   '/team': typeof AuthenticatedTeamRoute
@@ -73,6 +80,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/fb-outreach': typeof AuthenticatedFbOutreachRoute
+  '/finance': typeof AuthenticatedFinanceRoute
   '/leads': typeof AuthenticatedLeadsRoute
   '/prospecting': typeof AuthenticatedProspectingRoute
   '/team': typeof AuthenticatedTeamRoute
@@ -84,6 +92,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/fb-outreach': typeof AuthenticatedFbOutreachRoute
+  '/_authenticated/finance': typeof AuthenticatedFinanceRoute
   '/_authenticated/leads': typeof AuthenticatedLeadsRoute
   '/_authenticated/prospecting': typeof AuthenticatedProspectingRoute
   '/_authenticated/team': typeof AuthenticatedTeamRoute
@@ -95,6 +104,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/fb-outreach'
+    | '/finance'
     | '/leads'
     | '/prospecting'
     | '/team'
@@ -104,6 +114,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/fb-outreach'
+    | '/finance'
     | '/leads'
     | '/prospecting'
     | '/team'
@@ -114,6 +125,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/dashboard'
     | '/_authenticated/fb-outreach'
+    | '/_authenticated/finance'
     | '/_authenticated/leads'
     | '/_authenticated/prospecting'
     | '/_authenticated/team'
@@ -169,6 +181,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLeadsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/finance': {
+      id: '/_authenticated/finance'
+      path: '/finance'
+      fullPath: '/finance'
+      preLoaderRoute: typeof AuthenticatedFinanceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/fb-outreach': {
       id: '/_authenticated/fb-outreach'
       path: '/fb-outreach'
@@ -189,6 +208,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFbOutreachRoute: typeof AuthenticatedFbOutreachRoute
+  AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRoute
   AuthenticatedLeadsRoute: typeof AuthenticatedLeadsRoute
   AuthenticatedProspectingRoute: typeof AuthenticatedProspectingRoute
   AuthenticatedTeamRoute: typeof AuthenticatedTeamRoute
@@ -197,6 +217,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFbOutreachRoute: AuthenticatedFbOutreachRoute,
+  AuthenticatedFinanceRoute: AuthenticatedFinanceRoute,
   AuthenticatedLeadsRoute: AuthenticatedLeadsRoute,
   AuthenticatedProspectingRoute: AuthenticatedProspectingRoute,
   AuthenticatedTeamRoute: AuthenticatedTeamRoute,
