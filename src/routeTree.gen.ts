@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedTeamRouteImport } from './routes/_authenticated/team'
 import { Route as AuthenticatedProspectingRouteImport } from './routes/_authenticated/prospecting'
 import { Route as AuthenticatedLeadsRouteImport } from './routes/_authenticated/leads'
+import { Route as AuthenticatedFbOutreachRouteImport } from './routes/_authenticated/fb-outreach'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 
 const AuthRoute = AuthRouteImport.update({
@@ -47,6 +48,11 @@ const AuthenticatedLeadsRoute = AuthenticatedLeadsRouteImport.update({
   path: '/leads',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedFbOutreachRoute = AuthenticatedFbOutreachRouteImport.update({
+  id: '/fb-outreach',
+  path: '/fb-outreach',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -57,6 +63,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/fb-outreach': typeof AuthenticatedFbOutreachRoute
   '/leads': typeof AuthenticatedLeadsRoute
   '/prospecting': typeof AuthenticatedProspectingRoute
   '/team': typeof AuthenticatedTeamRoute
@@ -65,6 +72,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/fb-outreach': typeof AuthenticatedFbOutreachRoute
   '/leads': typeof AuthenticatedLeadsRoute
   '/prospecting': typeof AuthenticatedProspectingRoute
   '/team': typeof AuthenticatedTeamRoute
@@ -75,21 +83,37 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/fb-outreach': typeof AuthenticatedFbOutreachRoute
   '/_authenticated/leads': typeof AuthenticatedLeadsRoute
   '/_authenticated/prospecting': typeof AuthenticatedProspectingRoute
   '/_authenticated/team': typeof AuthenticatedTeamRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/dashboard' | '/leads' | '/prospecting' | '/team'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/fb-outreach'
+    | '/leads'
+    | '/prospecting'
+    | '/team'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/dashboard' | '/leads' | '/prospecting' | '/team'
+  to:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/fb-outreach'
+    | '/leads'
+    | '/prospecting'
+    | '/team'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/dashboard'
+    | '/_authenticated/fb-outreach'
     | '/_authenticated/leads'
     | '/_authenticated/prospecting'
     | '/_authenticated/team'
@@ -145,6 +169,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLeadsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/fb-outreach': {
+      id: '/_authenticated/fb-outreach'
+      path: '/fb-outreach'
+      fullPath: '/fb-outreach'
+      preLoaderRoute: typeof AuthenticatedFbOutreachRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -157,6 +188,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedFbOutreachRoute: typeof AuthenticatedFbOutreachRoute
   AuthenticatedLeadsRoute: typeof AuthenticatedLeadsRoute
   AuthenticatedProspectingRoute: typeof AuthenticatedProspectingRoute
   AuthenticatedTeamRoute: typeof AuthenticatedTeamRoute
@@ -164,6 +196,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedFbOutreachRoute: AuthenticatedFbOutreachRoute,
   AuthenticatedLeadsRoute: AuthenticatedLeadsRoute,
   AuthenticatedProspectingRoute: AuthenticatedProspectingRoute,
   AuthenticatedTeamRoute: AuthenticatedTeamRoute,
@@ -180,3 +213,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
