@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
       cities: {
         Row: {
           country_code: string
@@ -55,6 +76,139 @@ export type Database = {
           code?: string
           name?: string
           sort_order?: number
+        }
+        Relationships: []
+      }
+      fb_outreach: {
+        Row: {
+          business_name: string
+          city_id: string | null
+          contact_name: string | null
+          country_code: string | null
+          created_at: string
+          created_by: string
+          fb_page_url: string | null
+          id: string
+          message_status: Database["public"]["Enums"]["fb_message_status"]
+          messaged_at: string | null
+          niche_slug: string | null
+          notes: string | null
+          response: string | null
+          updated_at: string
+        }
+        Insert: {
+          business_name: string
+          city_id?: string | null
+          contact_name?: string | null
+          country_code?: string | null
+          created_at?: string
+          created_by: string
+          fb_page_url?: string | null
+          id?: string
+          message_status?: Database["public"]["Enums"]["fb_message_status"]
+          messaged_at?: string | null
+          niche_slug?: string | null
+          notes?: string | null
+          response?: string | null
+          updated_at?: string
+        }
+        Update: {
+          business_name?: string
+          city_id?: string | null
+          contact_name?: string | null
+          country_code?: string | null
+          created_at?: string
+          created_by?: string
+          fb_page_url?: string | null
+          id?: string
+          message_status?: Database["public"]["Enums"]["fb_message_status"]
+          messaged_at?: string | null
+          niche_slug?: string | null
+          notes?: string | null
+          response?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fb_outreach_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "cities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fb_outreach_country_code_fkey"
+            columns: ["country_code"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "fb_outreach_niche_slug_fkey"
+            columns: ["niche_slug"]
+            isOneToOne: false
+            referencedRelation: "niches"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
+      finance_entries: {
+        Row: {
+          amount_bdt: number
+          amount_usd: number
+          category: string
+          client_name: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          entry_date: string
+          id: string
+          kind: Database["public"]["Enums"]["finance_kind"]
+          notes: string | null
+          paid_to: string | null
+          project_name: string | null
+          split_member_a: number | null
+          split_member_b: number | null
+          updated_at: string
+          usd_rate: number | null
+        }
+        Insert: {
+          amount_bdt?: number
+          amount_usd?: number
+          category: string
+          client_name?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          entry_date?: string
+          id?: string
+          kind: Database["public"]["Enums"]["finance_kind"]
+          notes?: string | null
+          paid_to?: string | null
+          project_name?: string | null
+          split_member_a?: number | null
+          split_member_b?: number | null
+          updated_at?: string
+          usd_rate?: number | null
+        }
+        Update: {
+          amount_bdt?: number
+          amount_usd?: number
+          category?: string
+          client_name?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          entry_date?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["finance_kind"]
+          notes?: string | null
+          paid_to?: string | null
+          project_name?: string | null
+          split_member_a?: number | null
+          split_member_b?: number | null
+          updated_at?: string
+          usd_rate?: number | null
         }
         Relationships: []
       }
@@ -164,24 +318,39 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          bio: string | null
           created_at: string
           email: string | null
           full_name: string | null
           id: string
+          joined_at: string | null
+          phone: string | null
+          role_title: string | null
+          timezone: string | null
         }
         Insert: {
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
           id: string
+          joined_at?: string | null
+          phone?: string | null
+          role_title?: string | null
+          timezone?: string | null
         }
         Update: {
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
           id?: string
+          joined_at?: string | null
+          phone?: string | null
+          role_title?: string | null
+          timezone?: string | null
         }
         Relationships: []
       }
@@ -245,6 +414,14 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "member"
+      fb_message_status:
+        | "to_contact"
+        | "messaged"
+        | "no_response"
+        | "replied"
+        | "not_interested"
+        | "converted"
+      finance_kind: "income" | "expense"
       lead_status:
         | "new"
         | "audit_done"
@@ -384,6 +561,15 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "member"],
+      fb_message_status: [
+        "to_contact",
+        "messaged",
+        "no_response",
+        "replied",
+        "not_interested",
+        "converted",
+      ],
+      finance_kind: ["income", "expense"],
       lead_status: [
         "new",
         "audit_done",

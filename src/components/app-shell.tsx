@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { LayoutDashboard, Users2, Target, Map, LogOut, Settings, Sparkles } from "lucide-react";
+import { LayoutDashboard, Users2, Target, Map, LogOut, Sparkles, Facebook, Wallet } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,9 @@ import { toast } from "sonner";
 const navItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/leads", label: "Leads", icon: Users2 },
+  { to: "/fb-outreach", label: "FB Outreach", icon: Facebook },
   { to: "/prospecting", label: "Prospecting", icon: Map },
+  { to: "/finance", label: "Finance", icon: Wallet },
   { to: "/team", label: "Team", icon: Sparkles },
 ];
 
