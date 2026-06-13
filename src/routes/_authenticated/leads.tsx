@@ -124,15 +124,29 @@ function LeadsPage() {
               </div>
               <div className="p-2 space-y-2">
                 {(grouped[s.key] ?? []).map((l) => (
-                  <div key={l.id} className="p-3 rounded-lg bg-card border border-border hover:border-primary/50 transition-colors group">
+                  <div key={l.id} className="p-3 rounded-lg bg-card border border-border hover:border-primary/50 transition-colors">
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
                         <div className="text-sm font-medium truncate">{l.business_name}</div>
                         <div className="text-xs text-muted-foreground truncate">{l.niche_slug} · {l.country_code}</div>
                       </div>
-                      <button onClick={() => del.mutate(l.id)} className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition">
-                        <Trash2 className="size-3.5" />
-                      </button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <button className="text-muted-foreground hover:text-destructive transition shrink-0">
+                            <Trash2 className="size-3.5" />
+                          </button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete this lead?</AlertDialogTitle>
+                            <AlertDialogDescription>"{l.business_name}" will be permanently removed. This cannot be undone.</AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => del.mutate(l.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                     {l.email && <div className="text-xs text-muted-foreground mt-1 truncate">{l.email}</div>}
                     <Select value={l.status} onValueChange={(v) => updateStatus.mutate({ id: l.id, status: v })}>
