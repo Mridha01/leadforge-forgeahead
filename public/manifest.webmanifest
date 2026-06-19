@@ -1,0 +1,15 @@
+{
+  "name": "LeadForge CRM",
+  "short_name": "LeadForge",
+  "description": "Outreach CRM for local SEO and web design agencies.",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0B0F1A",
+  "theme_color": "#0B0F1A",
+  "icons": [
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
