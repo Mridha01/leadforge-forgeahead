@@ -55,9 +55,24 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
+
+    links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "icon", href: "/icon-512.png", type: "image/png" },
+      { rel: "apple-touch-icon", href: "/icon-512.png" },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" },
+    ],
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
+      { name: "theme-color", content: "#0B0F1A" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "apple-mobile-web-app-title", content: "LeadForge" },
+      { name: "mobile-web-app-capable", content: "yes" },
       { title: "LeadForge CRM" },
       { name: "description", content: "Outreach CRM for local SEO and web design agencies." },
       { property: "og:title", content: "LeadForge CRM" },
@@ -69,12 +84,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:type", content: "website" },
     ],
-    links: [
-      { rel: "stylesheet", href: appCss },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" },
-    ],
+
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -106,6 +116,18 @@ function RootComponent() {
     });
     return () => subscription.unsubscribe();
   }, [router, queryClient]);
+
+  // Live updates: refetch queries whenever team data changes in the backend
+  useEffect(() => {
+    const channel = supabase
+      .channel("leadforge-live")
+      .on("postgres_changes", { event: "*", schema: "public", table: "leads" }, () => queryClient.invalidateQueries())
+      .on("postgres_changes", { event: "*", schema: "public", table: "fb_outreach" }, () => queryClient.invalidateQueries())
+      .on("postgres_changes", { event: "*", schema: "public", table: "finance_entries" }, () => queryClient.invalidateQueries())
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [queryClient]);
+
 
   return (
     <QueryClientProvider client={queryClient}>
