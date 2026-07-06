@@ -217,61 +217,124 @@ export type Database = {
           assigned_to: string | null
           business_name: string
           city_id: string | null
+          competitor_strength: string | null
           country_code: string | null
           created_at: string
           created_by: string
           email: string | null
+          first_contact_date: string | null
+          followup_1_date: string | null
+          followup_2_date: string | null
+          followup_3_date: string | null
+          found_date: string | null
+          gbp_status: string | null
           gbp_url: string | null
           id: string
+          last_contact_date: string | null
           lead_source: string | null
+          local_ranking_potential: string | null
+          monthly_lead_potential: number | null
+          monthly_revenue: number | null
+          next_action_date: string | null
           niche_slug: string | null
           notes: string | null
+          order_status: string | null
           owner_name: string | null
           phone: string | null
+          recommended_seo_service: string | null
+          response_status: string | null
+          seo_weakness_notes: string | null
+          service_area: string | null
           status: Database["public"]["Enums"]["lead_status"]
+          tag: string | null
+          total_order_value: number | null
           updated_at: string
           website_score: number | null
+          website_seo_status: string | null
           website_url: string | null
+          whatsapp: string | null
         }
         Insert: {
           assigned_to?: string | null
           business_name: string
           city_id?: string | null
+          competitor_strength?: string | null
           country_code?: string | null
           created_at?: string
           created_by: string
           email?: string | null
+          first_contact_date?: string | null
+          followup_1_date?: string | null
+          followup_2_date?: string | null
+          followup_3_date?: string | null
+          found_date?: string | null
+          gbp_status?: string | null
           gbp_url?: string | null
           id?: string
+          last_contact_date?: string | null
           lead_source?: string | null
+          local_ranking_potential?: string | null
+          monthly_lead_potential?: number | null
+          monthly_revenue?: number | null
+          next_action_date?: string | null
           niche_slug?: string | null
           notes?: string | null
+          order_status?: string | null
           owner_name?: string | null
           phone?: string | null
+          recommended_seo_service?: string | null
+          response_status?: string | null
+          seo_weakness_notes?: string | null
+          service_area?: string | null
           status?: Database["public"]["Enums"]["lead_status"]
+          tag?: string | null
+          total_order_value?: number | null
           updated_at?: string
           website_score?: number | null
+          website_seo_status?: string | null
           website_url?: string | null
+          whatsapp?: string | null
         }
         Update: {
           assigned_to?: string | null
           business_name?: string
           city_id?: string | null
+          competitor_strength?: string | null
           country_code?: string | null
           created_at?: string
           created_by?: string
           email?: string | null
+          first_contact_date?: string | null
+          followup_1_date?: string | null
+          followup_2_date?: string | null
+          followup_3_date?: string | null
+          found_date?: string | null
+          gbp_status?: string | null
           gbp_url?: string | null
           id?: string
+          last_contact_date?: string | null
           lead_source?: string | null
+          local_ranking_potential?: string | null
+          monthly_lead_potential?: number | null
+          monthly_revenue?: number | null
+          next_action_date?: string | null
           niche_slug?: string | null
           notes?: string | null
+          order_status?: string | null
           owner_name?: string | null
           phone?: string | null
+          recommended_seo_service?: string | null
+          response_status?: string | null
+          seo_weakness_notes?: string | null
+          service_area?: string | null
           status?: Database["public"]["Enums"]["lead_status"]
+          tag?: string | null
+          total_order_value?: number | null
           updated_at?: string
           website_score?: number | null
+          website_seo_status?: string | null
           website_url?: string | null
+          whatsapp?: string | null
         }
         Relationships: [
           {
@@ -433,6 +496,12 @@ export type Database = {
         | "proposal"
         | "closed_won"
         | "closed_lost"
+        | "contacted"
+        | "interested"
+        | "proposal_sent"
+        | "negotiation"
+        | "converted"
+        | "monthly_seo"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -581,6 +650,12 @@ export const Constants = {
         "proposal",
         "closed_won",
         "closed_lost",
+        "contacted",
+        "interested",
+        "proposal_sent",
+        "negotiation",
+        "converted",
+        "monthly_seo",
       ],
     },
   },
