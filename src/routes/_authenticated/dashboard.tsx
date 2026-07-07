@@ -22,6 +22,7 @@ import {
   Target,
 } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
+import { ActivityFeed } from "@/components/activity-feed";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — LeadForge" }] }),
