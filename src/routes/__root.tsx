@@ -124,6 +124,7 @@ function RootComponent() {
       .on("postgres_changes", { event: "*", schema: "public", table: "leads" }, () => queryClient.invalidateQueries())
       .on("postgres_changes", { event: "*", schema: "public", table: "fb_outreach" }, () => queryClient.invalidateQueries())
       .on("postgres_changes", { event: "*", schema: "public", table: "finance_entries" }, () => queryClient.invalidateQueries())
+      .on("postgres_changes", { event: "*", schema: "public", table: "activity_log" }, () => queryClient.invalidateQueries({ queryKey: ["activity-log"] }))
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [queryClient]);

@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string
+          id: string
+          meta: Json | null
+          summary: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+          meta?: Json | null
+          summary: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          meta?: Json | null
+          summary?: string
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
           key: string
@@ -151,6 +184,33 @@ export type Database = {
             referencedColumns: ["slug"]
           },
         ]
+      }
+      fcm_tokens: {
+        Row: {
+          created_at: string
+          device_label: string | null
+          id: string
+          last_seen_at: string
+          token: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          device_label?: string | null
+          id?: string
+          last_seen_at?: string
+          token: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          device_label?: string | null
+          id?: string
+          last_seen_at?: string
+          token?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       finance_entries: {
         Row: {
@@ -416,6 +476,53 @@ export type Database = {
           timezone?: string | null
         }
         Relationships: []
+      }
+      saved_offers: {
+        Row: {
+          business_name: string | null
+          content: string
+          created_at: string
+          id: string
+          lead_id: string | null
+          meta: Json | null
+          template_key: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          business_name?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          lead_id?: string | null
+          meta?: Json | null
+          template_key: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          business_name?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          lead_id?: string | null
+          meta?: Json | null
+          template_key?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_offers_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       search_history: {
         Row: {

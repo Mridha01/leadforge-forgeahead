@@ -22,6 +22,7 @@ import {
   Target,
 } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
+import { ActivityFeed } from "@/components/activity-feed";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — LeadForge" }] }),
@@ -261,6 +262,8 @@ function DashboardPage() {
             </div>
           )}
         </Card>
+
+        <ActivityFeed />
 
         <div className="grid xl:grid-cols-3 gap-4">
           <Card className="p-5 bg-card border-border xl:col-span-2">
