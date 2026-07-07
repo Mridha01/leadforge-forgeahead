@@ -263,9 +263,8 @@ function DashboardPage() {
           )}
         </Card>
 
-        <div className="grid xl:grid-cols-3 gap-4">
-          <div className="xl:col-span-1"><ActivityFeed /></div>
-          <div className="xl:col-span-2 grid gap-4">
+        <ActivityFeed />
+
         <div className="grid xl:grid-cols-3 gap-4">
           <Card className="p-5 bg-card border-border xl:col-span-2">
             <div className="flex items-center justify-between mb-4">
