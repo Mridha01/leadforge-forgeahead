@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedTeamRouteImport } from './routes/_authenticated/team'
 import { Route as AuthenticatedProspectingRouteImport } from './routes/_authenticated/prospecting'
+import { Route as AuthenticatedPlannerRouteImport } from './routes/_authenticated/planner'
 import { Route as AuthenticatedOfferBuilderRouteImport } from './routes/_authenticated/offer-builder'
 import { Route as AuthenticatedLeadsRouteImport } from './routes/_authenticated/leads'
 import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated/finance'
@@ -45,6 +46,11 @@ const AuthenticatedProspectingRoute =
     path: '/prospecting',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedPlannerRoute = AuthenticatedPlannerRouteImport.update({
+  id: '/planner',
+  path: '/planner',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedOfferBuilderRoute =
   AuthenticatedOfferBuilderRouteImport.update({
     id: '/offer-builder',
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/finance': typeof AuthenticatedFinanceRoute
   '/leads': typeof AuthenticatedLeadsRoute
   '/offer-builder': typeof AuthenticatedOfferBuilderRoute
+  '/planner': typeof AuthenticatedPlannerRoute
   '/prospecting': typeof AuthenticatedProspectingRoute
   '/team': typeof AuthenticatedTeamRoute
 }
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
   '/finance': typeof AuthenticatedFinanceRoute
   '/leads': typeof AuthenticatedLeadsRoute
   '/offer-builder': typeof AuthenticatedOfferBuilderRoute
+  '/planner': typeof AuthenticatedPlannerRoute
   '/prospecting': typeof AuthenticatedProspectingRoute
   '/team': typeof AuthenticatedTeamRoute
 }
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/_authenticated/finance': typeof AuthenticatedFinanceRoute
   '/_authenticated/leads': typeof AuthenticatedLeadsRoute
   '/_authenticated/offer-builder': typeof AuthenticatedOfferBuilderRoute
+  '/_authenticated/planner': typeof AuthenticatedPlannerRoute
   '/_authenticated/prospecting': typeof AuthenticatedProspectingRoute
   '/_authenticated/team': typeof AuthenticatedTeamRoute
 }
@@ -117,6 +126,7 @@ export interface FileRouteTypes {
     | '/finance'
     | '/leads'
     | '/offer-builder'
+    | '/planner'
     | '/prospecting'
     | '/team'
   fileRoutesByTo: FileRoutesByTo
@@ -128,6 +138,7 @@ export interface FileRouteTypes {
     | '/finance'
     | '/leads'
     | '/offer-builder'
+    | '/planner'
     | '/prospecting'
     | '/team'
   id:
@@ -140,6 +151,7 @@ export interface FileRouteTypes {
     | '/_authenticated/finance'
     | '/_authenticated/leads'
     | '/_authenticated/offer-builder'
+    | '/_authenticated/planner'
     | '/_authenticated/prospecting'
     | '/_authenticated/team'
   fileRoutesById: FileRoutesById
@@ -187,6 +199,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProspectingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/planner': {
+      id: '/_authenticated/planner'
+      path: '/planner'
+      fullPath: '/planner'
+      preLoaderRoute: typeof AuthenticatedPlannerRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/offer-builder': {
       id: '/_authenticated/offer-builder'
       path: '/offer-builder'
@@ -231,6 +250,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRoute
   AuthenticatedLeadsRoute: typeof AuthenticatedLeadsRoute
   AuthenticatedOfferBuilderRoute: typeof AuthenticatedOfferBuilderRoute
+  AuthenticatedPlannerRoute: typeof AuthenticatedPlannerRoute
   AuthenticatedProspectingRoute: typeof AuthenticatedProspectingRoute
   AuthenticatedTeamRoute: typeof AuthenticatedTeamRoute
 }
@@ -241,6 +261,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFinanceRoute: AuthenticatedFinanceRoute,
   AuthenticatedLeadsRoute: AuthenticatedLeadsRoute,
   AuthenticatedOfferBuilderRoute: AuthenticatedOfferBuilderRoute,
+  AuthenticatedPlannerRoute: AuthenticatedPlannerRoute,
   AuthenticatedProspectingRoute: AuthenticatedProspectingRoute,
   AuthenticatedTeamRoute: AuthenticatedTeamRoute,
 }
