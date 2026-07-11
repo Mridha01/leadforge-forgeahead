@@ -554,50 +554,79 @@ export type Database = {
       tasks: {
         Row: {
           assigned_to: string | null
+          checklist: Json
           completed_at: string | null
+          country: string | null
           created_at: string
           created_by: string
+          deadline: string | null
           description: string | null
           duration_minutes: number | null
+          end_time: string | null
           id: string
+          niche: string | null
           priority: Database["public"]["Enums"]["task_priority"]
+          related_lead_id: string | null
           scheduled_date: string
           scheduled_time: string | null
+          sort_order: number
           status: Database["public"]["Enums"]["task_status"]
           title: string
           updated_at: string
         }
         Insert: {
           assigned_to?: string | null
+          checklist?: Json
           completed_at?: string | null
+          country?: string | null
           created_at?: string
           created_by: string
+          deadline?: string | null
           description?: string | null
           duration_minutes?: number | null
+          end_time?: string | null
           id?: string
+          niche?: string | null
           priority?: Database["public"]["Enums"]["task_priority"]
+          related_lead_id?: string | null
           scheduled_date?: string
           scheduled_time?: string | null
+          sort_order?: number
           status?: Database["public"]["Enums"]["task_status"]
           title: string
           updated_at?: string
         }
         Update: {
           assigned_to?: string | null
+          checklist?: Json
           completed_at?: string | null
+          country?: string | null
           created_at?: string
           created_by?: string
+          deadline?: string | null
           description?: string | null
           duration_minutes?: number | null
+          end_time?: string | null
           id?: string
+          niche?: string | null
           priority?: Database["public"]["Enums"]["task_priority"]
+          related_lead_id?: string | null
           scheduled_date?: string
           scheduled_time?: string | null
+          sort_order?: number
           status?: Database["public"]["Enums"]["task_status"]
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "tasks_related_lead_id_fkey"
+            columns: ["related_lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
