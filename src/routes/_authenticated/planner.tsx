@@ -108,6 +108,33 @@ function formatDuration(m: number | null) {
   const h = Math.floor(m / 60), r = m % 60;
   return h ? `${h}h${r ? ` ${r}m` : ""}` : `${r}m`;
 }
+function nowMinutes() { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); }
+function timeToMinutes(t: string | null) {
+  if (!t) return null;
+  const [h, m] = t.split(":").map(Number);
+  return h * 60 + m;
+}
+type TimeStatus =
+  | { kind: "upcoming"; startsInMin: number }
+  | { kind: "now"; endsInMin: number | null; startedAgoMin: number }
+  | { kind: "overdue"; overByMin: number }
+  | { kind: "past" }
+  | null;
+function computeTimeStatus(task: Task, isToday: boolean): TimeStatus {
+  if (!isToday || !task.scheduled_time || task.status === "done" || task.status === "skipped") return null;
+  const start = timeToMinutes(task.scheduled_time)!;
+  const end = timeToMinutes(task.end_time);
+  const now = nowMinutes();
+  if (now < start) return { kind: "upcoming", startsInMin: start - now };
+  if (end !== null && now > end) return { kind: "overdue", overByMin: now - end };
+  if (end === null && now - start > 24 * 60) return { kind: "past" };
+  return { kind: "now", startedAgoMin: now - start, endsInMin: end !== null ? end - now : null };
+}
+function humanMin(m: number) {
+  if (m < 60) return `${m}m`;
+  const h = Math.floor(m / 60), r = m % 60;
+  return r ? `${h}h ${r}m` : `${h}h`;
+}
 
 function PlannerPage() {
   const qc = useQueryClient();
@@ -119,8 +146,10 @@ function PlannerPage() {
   const [selectedDate, setSelectedDate] = useState<string>(todayISO());
   const [monthCursor, setMonthCursor] = useState(() => { const d = new Date(); d.setDate(1); return d; });
   const [showCompleted, setShowCompleted] = useState(false);
+  const [, setTick] = useState(0);
 
   useEffect(() => { supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null)); }, []);
+  useEffect(() => { const id = setInterval(() => setTick((n) => n + 1), 30_000); return () => clearInterval(id); }, []);
 
   const { data: tasks = [] } = useQuery({
     queryKey: ["planner-tasks"],
@@ -161,7 +190,20 @@ function PlannerPage() {
 
   const today = todayISO();
   const dayTasks = useMemo(() => scoped.filter((t) => t.scheduled_date === selectedDate), [scoped, selectedDate]);
-  const openDayTasks = useMemo(() => dayTasks.filter((t) => t.status !== "done"), [dayTasks]);
+  const openDayTasks = useMemo(() => {
+    return dayTasks
+      .filter((t) => t.status !== "done")
+      .slice()
+      .sort((a, b) => {
+        const at = timeToMinutes(a.scheduled_time);
+        const bt = timeToMinutes(b.scheduled_time);
+        if (at === null && bt === null) return a.sort_order - b.sort_order;
+        if (at === null) return 1;
+        if (bt === null) return -1;
+        if (at !== bt) return at - bt;
+        return a.sort_order - b.sort_order;
+      });
+  }, [dayTasks]);
   const doneDayTasks = useMemo(() => dayTasks.filter((t) => t.status === "done"), [dayTasks]);
   const overdue = useMemo(
     () => scoped.filter((t) => t.scheduled_date < today && t.status !== "done" && t.status !== "skipped"),
@@ -336,6 +378,7 @@ function PlannerPage() {
                 {openDayTasks.map((t) => (
                   <SortableTaskRow
                     key={t.id} task={t} profileMap={profileMap} leadMap={leadMap} userId={userId}
+                    isToday={selectedDate === today}
                     onEdit={openEdit} onDelete={(id) => del.mutate(id)}
                     onStatus={(id, s) => setStatus.mutate({ id, status: s })}
                     onChecklistToggle={(taskId, itemId) => {
@@ -521,9 +564,10 @@ function SortableTaskRow(props: React.ComponentProps<typeof TaskRow>) {
 }
 
 function TaskRow({
-  task, profileMap, leadMap, userId, onEdit, onDelete, onStatus, onChecklistToggle, dragHandle,
+  task, profileMap, leadMap, userId, isToday = false, onEdit, onDelete, onStatus, onChecklistToggle, dragHandle,
 }: {
   task: Task; profileMap: Record<string, Profile>; leadMap: Record<string, Lead>; userId: string | null;
+  isToday?: boolean;
   onEdit: (t: Task) => void; onDelete: (id: string) => void;
   onStatus: (id: string, s: Task["status"]) => void;
   onChecklistToggle: (taskId: string, itemId: string) => void;
@@ -540,9 +584,21 @@ function TaskRow({
     ? task.end_time ? `${formatTime(task.scheduled_time)} – ${formatTime(task.end_time)}` : formatTime(task.scheduled_time)
     : "Anytime";
   const checkDone = task.checklist.filter((c) => c.done).length;
+  const ts = computeTimeStatus(task, isToday);
+  const isNow = ts?.kind === "now";
+  const isOverdueTime = ts?.kind === "overdue";
+  const isSoon = ts?.kind === "upcoming" && ts.startsInMin <= 30;
 
   return (
-    <Card className={cn("p-3 border-border bg-card transition-colors hover:border-primary/30", done && "opacity-70")}>
+    <Card className={cn(
+      "p-3 border-border bg-card transition-colors hover:border-primary/30 relative overflow-hidden",
+      done && "opacity-70",
+      isNow && "border-primary/60 bg-primary/[0.04] shadow-[0_0_0_1px_hsl(var(--primary)/0.3)]",
+      isOverdueTime && "border-destructive/50 bg-destructive/[0.04]",
+      isSoon && "border-warning/50",
+    )}>
+      {isNow && <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary" />}
+      {isOverdueTime && <div className="absolute left-0 top-0 bottom-0 w-1 bg-destructive" />}
       <div className="flex items-start gap-2">
         {dragHandle && <div className="mt-1">{dragHandle}</div>}
         <button
@@ -563,7 +619,26 @@ function TaskRow({
               <Badge variant="outline" className={cn("text-[10px] gap-1", PRIORITY_TONE[task.priority])}>
                 <Flame className="size-2.5" /> {task.priority}
               </Badge>
-              {task.status === "in_progress" && (
+              {ts?.kind === "now" && (
+                <Badge className="text-[10px] gap-1 bg-primary text-primary-foreground border-transparent animate-pulse">
+                  <span className="size-1.5 rounded-full bg-primary-foreground" />
+                  NOW
+                  {ts.endsInMin !== null
+                    ? ` · ${humanMin(Math.max(0, ts.endsInMin))} left`
+                    : ` · started ${humanMin(ts.startedAgoMin)} ago`}
+                </Badge>
+              )}
+              {ts?.kind === "upcoming" && (
+                <Badge variant="outline" className={cn("text-[10px] gap-1", ts.startsInMin <= 30 ? "border-warning/50 text-warning" : "border-border text-muted-foreground")}>
+                  <Clock className="size-2.5" /> starts in {humanMin(ts.startsInMin)}
+                </Badge>
+              )}
+              {ts?.kind === "overdue" && (
+                <Badge variant="outline" className="text-[10px] gap-1 border-destructive/50 text-destructive">
+                  <AlertTriangle className="size-2.5" /> overdue by {humanMin(ts.overByMin)}
+                </Badge>
+              )}
+              {task.status === "in_progress" && !ts && (
                 <Badge variant="secondary" className={cn("text-[10px]", STATUS_TONE.in_progress)}>In progress</Badge>
               )}
               {task.checklist.length > 0 && (
