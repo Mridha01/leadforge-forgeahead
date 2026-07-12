@@ -564,9 +564,10 @@ function SortableTaskRow(props: React.ComponentProps<typeof TaskRow>) {
 }
 
 function TaskRow({
-  task, profileMap, leadMap, userId, onEdit, onDelete, onStatus, onChecklistToggle, dragHandle,
+  task, profileMap, leadMap, userId, isToday = false, onEdit, onDelete, onStatus, onChecklistToggle, dragHandle,
 }: {
   task: Task; profileMap: Record<string, Profile>; leadMap: Record<string, Lead>; userId: string | null;
+  isToday?: boolean;
   onEdit: (t: Task) => void; onDelete: (id: string) => void;
   onStatus: (id: string, s: Task["status"]) => void;
   onChecklistToggle: (taskId: string, itemId: string) => void;
@@ -583,9 +584,21 @@ function TaskRow({
     ? task.end_time ? `${formatTime(task.scheduled_time)} – ${formatTime(task.end_time)}` : formatTime(task.scheduled_time)
     : "Anytime";
   const checkDone = task.checklist.filter((c) => c.done).length;
+  const ts = computeTimeStatus(task, isToday);
+  const isNow = ts?.kind === "now";
+  const isOverdueTime = ts?.kind === "overdue";
+  const isSoon = ts?.kind === "upcoming" && ts.startsInMin <= 30;
 
   return (
-    <Card className={cn("p-3 border-border bg-card transition-colors hover:border-primary/30", done && "opacity-70")}>
+    <Card className={cn(
+      "p-3 border-border bg-card transition-colors hover:border-primary/30 relative overflow-hidden",
+      done && "opacity-70",
+      isNow && "border-primary/60 bg-primary/[0.04] shadow-[0_0_0_1px_hsl(var(--primary)/0.3)]",
+      isOverdueTime && "border-destructive/50 bg-destructive/[0.04]",
+      isSoon && "border-warning/50",
+    )}>
+      {isNow && <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary" />}
+      {isOverdueTime && <div className="absolute left-0 top-0 bottom-0 w-1 bg-destructive" />}
       <div className="flex items-start gap-2">
         {dragHandle && <div className="mt-1">{dragHandle}</div>}
         <button
