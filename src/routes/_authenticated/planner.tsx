@@ -378,6 +378,7 @@ function PlannerPage() {
                 {openDayTasks.map((t) => (
                   <SortableTaskRow
                     key={t.id} task={t} profileMap={profileMap} leadMap={leadMap} userId={userId}
+                    isToday={selectedDate === today}
                     onEdit={openEdit} onDelete={(id) => del.mutate(id)}
                     onStatus={(id, s) => setStatus.mutate({ id, status: s })}
                     onChecklistToggle={(taskId, itemId) => {
