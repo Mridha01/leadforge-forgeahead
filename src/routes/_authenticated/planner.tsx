@@ -108,6 +108,33 @@ function formatDuration(m: number | null) {
   const h = Math.floor(m / 60), r = m % 60;
   return h ? `${h}h${r ? ` ${r}m` : ""}` : `${r}m`;
 }
+function nowMinutes() { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); }
+function timeToMinutes(t: string | null) {
+  if (!t) return null;
+  const [h, m] = t.split(":").map(Number);
+  return h * 60 + m;
+}
+type TimeStatus =
+  | { kind: "upcoming"; startsInMin: number }
+  | { kind: "now"; endsInMin: number | null; startedAgoMin: number }
+  | { kind: "overdue"; overByMin: number }
+  | { kind: "past" }
+  | null;
+function computeTimeStatus(task: Task, isToday: boolean): TimeStatus {
+  if (!isToday || !task.scheduled_time || task.status === "done" || task.status === "skipped") return null;
+  const start = timeToMinutes(task.scheduled_time)!;
+  const end = timeToMinutes(task.end_time);
+  const now = nowMinutes();
+  if (now < start) return { kind: "upcoming", startsInMin: start - now };
+  if (end !== null && now > end) return { kind: "overdue", overByMin: now - end };
+  if (end === null && now - start > 24 * 60) return { kind: "past" };
+  return { kind: "now", startedAgoMin: now - start, endsInMin: end !== null ? end - now : null };
+}
+function humanMin(m: number) {
+  if (m < 60) return `${m}m`;
+  const h = Math.floor(m / 60), r = m % 60;
+  return r ? `${h}h ${r}m` : `${h}h`;
+}
 
 function PlannerPage() {
   const qc = useQueryClient();
