@@ -619,7 +619,26 @@ function TaskRow({
               <Badge variant="outline" className={cn("text-[10px] gap-1", PRIORITY_TONE[task.priority])}>
                 <Flame className="size-2.5" /> {task.priority}
               </Badge>
-              {task.status === "in_progress" && (
+              {ts?.kind === "now" && (
+                <Badge className="text-[10px] gap-1 bg-primary text-primary-foreground border-transparent animate-pulse">
+                  <span className="size-1.5 rounded-full bg-primary-foreground" />
+                  NOW
+                  {ts.endsInMin !== null
+                    ? ` · ${humanMin(Math.max(0, ts.endsInMin))} left`
+                    : ` · started ${humanMin(ts.startedAgoMin)} ago`}
+                </Badge>
+              )}
+              {ts?.kind === "upcoming" && (
+                <Badge variant="outline" className={cn("text-[10px] gap-1", ts.startsInMin <= 30 ? "border-warning/50 text-warning" : "border-border text-muted-foreground")}>
+                  <Clock className="size-2.5" /> starts in {humanMin(ts.startsInMin)}
+                </Badge>
+              )}
+              {ts?.kind === "overdue" && (
+                <Badge variant="outline" className="text-[10px] gap-1 border-destructive/50 text-destructive">
+                  <AlertTriangle className="size-2.5" /> overdue by {humanMin(ts.overByMin)}
+                </Badge>
+              )}
+              {task.status === "in_progress" && !ts && (
                 <Badge variant="secondary" className={cn("text-[10px]", STATUS_TONE.in_progress)}>In progress</Badge>
               )}
               {task.checklist.length > 0 && (
