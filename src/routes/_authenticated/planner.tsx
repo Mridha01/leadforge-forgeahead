@@ -188,7 +188,20 @@ function PlannerPage() {
 
   const today = todayISO();
   const dayTasks = useMemo(() => scoped.filter((t) => t.scheduled_date === selectedDate), [scoped, selectedDate]);
-  const openDayTasks = useMemo(() => dayTasks.filter((t) => t.status !== "done"), [dayTasks]);
+  const openDayTasks = useMemo(() => {
+    return dayTasks
+      .filter((t) => t.status !== "done")
+      .slice()
+      .sort((a, b) => {
+        const at = timeToMinutes(a.scheduled_time);
+        const bt = timeToMinutes(b.scheduled_time);
+        if (at === null && bt === null) return a.sort_order - b.sort_order;
+        if (at === null) return 1;
+        if (bt === null) return -1;
+        if (at !== bt) return at - bt;
+        return a.sort_order - b.sort_order;
+      });
+  }, [dayTasks]);
   const doneDayTasks = useMemo(() => dayTasks.filter((t) => t.status === "done"), [dayTasks]);
   const overdue = useMemo(
     () => scoped.filter((t) => t.scheduled_date < today && t.status !== "done" && t.status !== "skipped"),
