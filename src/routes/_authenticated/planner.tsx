@@ -146,8 +146,10 @@ function PlannerPage() {
   const [selectedDate, setSelectedDate] = useState<string>(todayISO());
   const [monthCursor, setMonthCursor] = useState(() => { const d = new Date(); d.setDate(1); return d; });
   const [showCompleted, setShowCompleted] = useState(false);
+  const [, setTick] = useState(0);
 
   useEffect(() => { supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null)); }, []);
+  useEffect(() => { const id = setInterval(() => setTick((n) => n + 1), 30_000); return () => clearInterval(id); }, []);
 
   const { data: tasks = [] } = useQuery({
     queryKey: ["planner-tasks"],
