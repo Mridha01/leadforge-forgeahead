@@ -301,6 +301,12 @@ function PlannerPage() {
               <Button size="sm" variant={scope === "team" ? "default" : "ghost"} className="h-8" onClick={() => setScope("team")}>Team</Button>
               <Button size="sm" variant={scope === "mine" ? "default" : "ghost"} className="h-8" onClick={() => setScope("mine")}>Mine</Button>
             </div>
+            <LoadFromListButton
+              targetDate={selectedDate}
+              userId={userId}
+              onLoaded={() => qc.invalidateQueries({ queryKey: ["planner-tasks"] })}
+              existingSortMax={Math.max(0, ...tasks.filter((t) => t.scheduled_date === selectedDate).map((t) => t.sort_order))}
+            />
             <Dialog open={dialogOpen} onOpenChange={(o) => { setDialogOpen(o); if (!o) setEditing(null); }}>
               <DialogTrigger asChild>
                 <Button size="sm" className="gap-1.5" onClick={() => openNew()}>
