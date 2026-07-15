@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { LayoutDashboard, Users2, Target, Map, LogOut, Sparkles, Facebook, Wallet, FileText, CalendarCheck2 } from "lucide-react";
+import { LayoutDashboard, Users2, Target, Map, LogOut, Sparkles, Facebook, Wallet, FileText, CalendarCheck2, ListChecks } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { toast } from "sonner";
 const navItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/planner", label: "Planner", icon: CalendarCheck2 },
+  { to: "/task-lists", label: "Task Lists", icon: ListChecks },
   { to: "/leads", label: "Leads", icon: Users2 },
   { to: "/fb-outreach", label: "FB Outreach", icon: Facebook },
   { to: "/offer-builder", label: "Offer Builder", icon: FileText },

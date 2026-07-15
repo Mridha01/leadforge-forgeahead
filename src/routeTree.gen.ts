@@ -13,6 +13,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedTeamRouteImport } from './routes/_authenticated/team'
+import { Route as AuthenticatedTaskListsRouteImport } from './routes/_authenticated/task-lists'
 import { Route as AuthenticatedProspectingRouteImport } from './routes/_authenticated/prospecting'
 import { Route as AuthenticatedPlannerRouteImport } from './routes/_authenticated/planner'
 import { Route as AuthenticatedOfferBuilderRouteImport } from './routes/_authenticated/offer-builder'
@@ -38,6 +39,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthenticatedTeamRoute = AuthenticatedTeamRouteImport.update({
   id: '/team',
   path: '/team',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTaskListsRoute = AuthenticatedTaskListsRouteImport.update({
+  id: '/task-lists',
+  path: '/task-lists',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedProspectingRoute =
@@ -88,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/offer-builder': typeof AuthenticatedOfferBuilderRoute
   '/planner': typeof AuthenticatedPlannerRoute
   '/prospecting': typeof AuthenticatedProspectingRoute
+  '/task-lists': typeof AuthenticatedTaskListsRoute
   '/team': typeof AuthenticatedTeamRoute
 }
 export interface FileRoutesByTo {
@@ -100,6 +107,7 @@ export interface FileRoutesByTo {
   '/offer-builder': typeof AuthenticatedOfferBuilderRoute
   '/planner': typeof AuthenticatedPlannerRoute
   '/prospecting': typeof AuthenticatedProspectingRoute
+  '/task-lists': typeof AuthenticatedTaskListsRoute
   '/team': typeof AuthenticatedTeamRoute
 }
 export interface FileRoutesById {
@@ -114,6 +122,7 @@ export interface FileRoutesById {
   '/_authenticated/offer-builder': typeof AuthenticatedOfferBuilderRoute
   '/_authenticated/planner': typeof AuthenticatedPlannerRoute
   '/_authenticated/prospecting': typeof AuthenticatedProspectingRoute
+  '/_authenticated/task-lists': typeof AuthenticatedTaskListsRoute
   '/_authenticated/team': typeof AuthenticatedTeamRoute
 }
 export interface FileRouteTypes {
@@ -128,6 +137,7 @@ export interface FileRouteTypes {
     | '/offer-builder'
     | '/planner'
     | '/prospecting'
+    | '/task-lists'
     | '/team'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -140,6 +150,7 @@ export interface FileRouteTypes {
     | '/offer-builder'
     | '/planner'
     | '/prospecting'
+    | '/task-lists'
     | '/team'
   id:
     | '__root__'
@@ -153,6 +164,7 @@ export interface FileRouteTypes {
     | '/_authenticated/offer-builder'
     | '/_authenticated/planner'
     | '/_authenticated/prospecting'
+    | '/_authenticated/task-lists'
     | '/_authenticated/team'
   fileRoutesById: FileRoutesById
 }
@@ -190,6 +202,13 @@ declare module '@tanstack/react-router' {
       path: '/team'
       fullPath: '/team'
       preLoaderRoute: typeof AuthenticatedTeamRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/task-lists': {
+      id: '/_authenticated/task-lists'
+      path: '/task-lists'
+      fullPath: '/task-lists'
+      preLoaderRoute: typeof AuthenticatedTaskListsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/prospecting': {
@@ -252,6 +271,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedOfferBuilderRoute: typeof AuthenticatedOfferBuilderRoute
   AuthenticatedPlannerRoute: typeof AuthenticatedPlannerRoute
   AuthenticatedProspectingRoute: typeof AuthenticatedProspectingRoute
+  AuthenticatedTaskListsRoute: typeof AuthenticatedTaskListsRoute
   AuthenticatedTeamRoute: typeof AuthenticatedTeamRoute
 }
 
@@ -263,6 +283,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOfferBuilderRoute: AuthenticatedOfferBuilderRoute,
   AuthenticatedPlannerRoute: AuthenticatedPlannerRoute,
   AuthenticatedProspectingRoute: AuthenticatedProspectingRoute,
+  AuthenticatedTaskListsRoute: AuthenticatedTaskListsRoute,
   AuthenticatedTeamRoute: AuthenticatedTeamRoute,
 }
 
