@@ -293,6 +293,7 @@ function EntryDialog({ onClose, rate, memberA, memberB, initial }: any) {
   const qc = useQueryClient();
   const [form, setForm] = useState({
     kind: initial?.kind ?? "income",
+    currency: initial?.currency ?? "USD",
     category: initial?.category ?? "Web design",
     description: initial?.description ?? "",
     amount_usd: initial?.amount_usd != null ? String(initial.amount_usd) : "",
@@ -307,13 +308,18 @@ function EntryDialog({ onClose, rate, memberA, memberB, initial }: any) {
     notes: initial?.notes ?? "",
   });
 
-  // Auto-recalc BDT and 50/50 split when USD or rate changes
+  // Auto-convert between USD ↔ BDT based on selected primary currency
   useEffect(() => {
-    const usd = Number(form.amount_usd) || 0;
     const r = Number(form.usd_rate) || rate;
-    setForm((f) => ({ ...f, amount_bdt: (usd * r).toFixed(2) }));
+    if (form.currency === "USD") {
+      const usd = Number(form.amount_usd) || 0;
+      setForm((f) => ({ ...f, amount_bdt: (usd * r).toFixed(2) }));
+    } else {
+      const bdt = Number(form.amount_bdt) || 0;
+      setForm((f) => ({ ...f, amount_usd: r > 0 ? (bdt / r).toFixed(2) : "0" }));
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form.amount_usd, form.usd_rate]);
+  }, [form.amount_usd, form.amount_bdt, form.usd_rate, form.currency]);
 
   const fillEqualSplit = () => {
     const usd = Number(form.amount_usd) || 0;
