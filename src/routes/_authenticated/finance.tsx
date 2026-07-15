@@ -335,6 +335,7 @@ function EntryDialog({ onClose, rate, memberA, memberB, initial }: any) {
       if (!u.user) throw new Error("Not signed in");
       const payload: any = {
         kind: form.kind,
+        currency: form.currency,
         category: form.category,
         description: form.description || null,
         amount_usd: Number(form.amount_usd) || 0,
