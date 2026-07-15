@@ -184,7 +184,7 @@ function OfferBuilderPage() {
     <div>
       <PageHeader
         title="Offer Builder"
-        subtitle="Generate FB cold-outreach messages and proposals in seconds"
+        subtitle="Generate FB DMs, cold emails, and proposals in seconds"
         action={
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={copy} className="gap-1.5"><Copy className="size-3.5" /> Copy</Button>
