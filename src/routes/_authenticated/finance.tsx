@@ -442,7 +442,7 @@ function EntryDialog({ onClose, rate, memberA, memberB, initial }: any) {
       </div>
       <DialogFooter>
         <Button variant="ghost" onClick={onClose}>Cancel</Button>
-        <Button onClick={() => save.mutate()} disabled={!form.amount_usd || save.isPending}>{initial ? "Save" : "Add entry"}</Button>
+        <Button onClick={() => save.mutate()} disabled={(form.currency === "USD" ? !form.amount_usd : !form.amount_bdt) || save.isPending}>{initial ? "Save" : "Add entry"}</Button>
       </DialogFooter>
     </DialogContent>
   );
