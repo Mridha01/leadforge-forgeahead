@@ -293,6 +293,7 @@ function EntryDialog({ onClose, rate, memberA, memberB, initial }: any) {
   const qc = useQueryClient();
   const [form, setForm] = useState({
     kind: initial?.kind ?? "income",
+    currency: initial?.currency ?? "USD",
     category: initial?.category ?? "Web design",
     description: initial?.description ?? "",
     amount_usd: initial?.amount_usd != null ? String(initial.amount_usd) : "",
@@ -307,13 +308,18 @@ function EntryDialog({ onClose, rate, memberA, memberB, initial }: any) {
     notes: initial?.notes ?? "",
   });
 
-  // Auto-recalc BDT and 50/50 split when USD or rate changes
+  // Auto-convert between USD ↔ BDT based on selected primary currency
   useEffect(() => {
-    const usd = Number(form.amount_usd) || 0;
     const r = Number(form.usd_rate) || rate;
-    setForm((f) => ({ ...f, amount_bdt: (usd * r).toFixed(2) }));
+    if (form.currency === "USD") {
+      const usd = Number(form.amount_usd) || 0;
+      setForm((f) => ({ ...f, amount_bdt: (usd * r).toFixed(2) }));
+    } else {
+      const bdt = Number(form.amount_bdt) || 0;
+      setForm((f) => ({ ...f, amount_usd: r > 0 ? (bdt / r).toFixed(2) : "0" }));
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form.amount_usd, form.usd_rate]);
+  }, [form.amount_usd, form.amount_bdt, form.usd_rate, form.currency]);
 
   const fillEqualSplit = () => {
     const usd = Number(form.amount_usd) || 0;
@@ -329,6 +335,7 @@ function EntryDialog({ onClose, rate, memberA, memberB, initial }: any) {
       if (!u.user) throw new Error("Not signed in");
       const payload: any = {
         kind: form.kind,
+        currency: form.currency,
         category: form.category,
         description: form.description || null,
         amount_usd: Number(form.amount_usd) || 0,
@@ -358,7 +365,7 @@ function EntryDialog({ onClose, rate, memberA, memberB, initial }: any) {
     <DialogContent className="max-w-xl">
       <DialogHeader>
         <DialogTitle>{initial ? "Edit entry" : "New finance entry"}</DialogTitle>
-        <DialogDescription>Record an income or expense. USD amounts are auto-converted to BDT.</DialogDescription>
+        <DialogDescription>Record an income or expense. Amounts auto-convert between USD and BDT.</DialogDescription>
       </DialogHeader>
       <div className="grid grid-cols-2 gap-3">
         <Field label="Type">
@@ -370,6 +377,12 @@ function EntryDialog({ onClose, rate, memberA, memberB, initial }: any) {
             </SelectContent>
           </Select>
         </Field>
+        <Field label="Currency">
+          <div className="inline-flex rounded-lg border border-border bg-card p-0.5 w-full">
+            <Button type="button" size="sm" variant={form.currency === "USD" ? "default" : "ghost"} className="h-8 flex-1" onClick={() => setForm({ ...form, currency: "USD" })}>$ USD</Button>
+            <Button type="button" size="sm" variant={form.currency === "BDT" ? "default" : "ghost"} className="h-8 flex-1" onClick={() => setForm({ ...form, currency: "BDT" })}>৳ BDT</Button>
+          </div>
+        </Field>
         <Field label="Category">
           <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
             <SelectTrigger><SelectValue /></SelectTrigger>
@@ -377,22 +390,38 @@ function EntryDialog({ onClose, rate, memberA, memberB, initial }: any) {
           </Select>
         </Field>
         <Field label="Date"><Input type="date" value={form.entry_date} onChange={(e) => setForm({ ...form, entry_date: e.target.value })} /></Field>
-        <Field label={form.kind === "income" ? "Client name" : "Paid to / Vendor"}>
+        <Field label={form.kind === "income" ? "Client name" : "Paid to / Vendor"} className="col-span-2">
           <Input value={form.kind === "income" ? form.client_name : form.paid_to}
             onChange={(e) => setForm({ ...form, [form.kind === "income" ? "client_name" : "paid_to"]: e.target.value } as any)} />
         </Field>
         {form.kind === "income" && (
           <Field label="Project" className="col-span-2"><Input value={form.project_name} onChange={(e) => setForm({ ...form, project_name: e.target.value })} /></Field>
         )}
-        <Field label="Amount (USD) *">
-          <Input type="number" step="0.01" value={form.amount_usd} onChange={(e) => setForm({ ...form, amount_usd: e.target.value })} />
-        </Field>
-        <Field label="USD → BDT rate">
-          <Input type="number" step="0.01" value={form.usd_rate} onChange={(e) => setForm({ ...form, usd_rate: e.target.value })} />
-        </Field>
-        <Field label="Amount (BDT)" className="col-span-2">
-          <Input type="number" step="0.01" value={form.amount_bdt} onChange={(e) => setForm({ ...form, amount_bdt: e.target.value })} />
-        </Field>
+        {form.currency === "USD" ? (
+          <>
+            <Field label="Amount (USD) *">
+              <Input type="number" step="0.01" value={form.amount_usd} onChange={(e) => setForm({ ...form, amount_usd: e.target.value })} />
+            </Field>
+            <Field label="USD → BDT rate">
+              <Input type="number" step="0.01" value={form.usd_rate} onChange={(e) => setForm({ ...form, usd_rate: e.target.value })} />
+            </Field>
+            <Field label="Amount (BDT, auto)" className="col-span-2">
+              <Input type="number" step="0.01" value={form.amount_bdt} readOnly className="bg-muted/40" />
+            </Field>
+          </>
+        ) : (
+          <>
+            <Field label="Amount (BDT) *">
+              <Input type="number" step="0.01" value={form.amount_bdt} onChange={(e) => setForm({ ...form, amount_bdt: e.target.value })} />
+            </Field>
+            <Field label="USD → BDT rate">
+              <Input type="number" step="0.01" value={form.usd_rate} onChange={(e) => setForm({ ...form, usd_rate: e.target.value })} />
+            </Field>
+            <Field label="Amount (USD, auto)" className="col-span-2">
+              <Input type="number" step="0.01" value={form.amount_usd} readOnly className="bg-muted/40" />
+            </Field>
+          </>
+        )}
 
         {form.kind === "income" && (
           <>
@@ -413,7 +442,7 @@ function EntryDialog({ onClose, rate, memberA, memberB, initial }: any) {
       </div>
       <DialogFooter>
         <Button variant="ghost" onClick={onClose}>Cancel</Button>
-        <Button onClick={() => save.mutate()} disabled={!form.amount_usd || save.isPending}>{initial ? "Save" : "Add entry"}</Button>
+        <Button onClick={() => save.mutate()} disabled={(form.currency === "USD" ? !form.amount_usd : !form.amount_bdt) || save.isPending}>{initial ? "Save" : "Add entry"}</Button>
       </DialogFooter>
     </DialogContent>
   );

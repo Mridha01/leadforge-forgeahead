@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Sparkles, Copy, Save, Trash2, MessageCircle, FileText, Send } from "lucide-react";
+import { Sparkles, Copy, Save, Trash2, MessageCircle, FileText, Send, Mail } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/offer-builder")({
@@ -97,6 +97,31 @@ Ready to start? Reply "let's go" and I'll send the onboarding link.
 
 — ${v.sender_name || "Team"}`,
   },
+  {
+    key: "email_outreach",
+    label: "Cold Email",
+    icon: Mail,
+    description: "Subject + body email pitch for local SEO / web design. Personalised opener + 3 wins + soft CTA.",
+    build: (v: Vars) => `Subject: Quick idea to get ${v.business_name || "your business"} into Google's local top 3
+
+Hi ${v.owner_name || "there"},
+
+I was looking at ${v.niche || "local"} businesses in ${v.city || "your city"} this week and ${v.business_name || "your site"} stood out — but I noticed ${v.pain || "you're not ranking in the Google Local 3-pack for the main search terms your customers use"}.
+
+That matters because ~78% of new local customers pick from those top 3 map results before they even scroll.
+
+3 things we could fix in the first 30 days:
+ 1. Optimise Google Business Profile (categories, services, weekly posts)
+ 2. Fix on-page SEO for "${v.niche || "your service"} in ${v.city || "your city"}"
+ 3. Set up an auto-review request flow so ranking signals grow every week
+
+Most of our ${v.niche || "local"} clients see 4–7 position jumps in the first month${v.offer_price ? ` — plans start at ${v.offer_price}/mo, no lock-in` : ""}.
+
+Worth a quick 15-min call this week? Just reply and I'll send a couple of time slots.
+
+Best,
+${v.sender_name || "Team"}`,
+  },
 ] as const;
 
 function OfferBuilderPage() {
@@ -159,7 +184,7 @@ function OfferBuilderPage() {
     <div>
       <PageHeader
         title="Offer Builder"
-        subtitle="Generate FB cold-outreach messages and proposals in seconds"
+        subtitle="Generate FB DMs, cold emails, and proposals in seconds"
         action={
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={copy} className="gap-1.5"><Copy className="size-3.5" /> Copy</Button>

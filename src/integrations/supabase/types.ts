@@ -220,6 +220,7 @@ export type Database = {
           client_name: string | null
           created_at: string
           created_by: string
+          currency: string
           description: string | null
           entry_date: string
           id: string
@@ -239,6 +240,7 @@ export type Database = {
           client_name?: string | null
           created_at?: string
           created_by: string
+          currency?: string
           description?: string | null
           entry_date?: string
           id?: string
@@ -258,6 +260,7 @@ export type Database = {
           client_name?: string | null
           created_at?: string
           created_by?: string
+          currency?: string
           description?: string | null
           entry_date?: string
           id?: string
@@ -548,6 +551,83 @@ export type Database = {
           niche_slug?: string | null
           query?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      task_template_items: {
+        Row: {
+          checklist: Json
+          created_at: string
+          default_duration_minutes: number | null
+          description: string | null
+          id: string
+          priority: string
+          sort_order: number
+          template_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          checklist?: Json
+          created_at?: string
+          default_duration_minutes?: number | null
+          description?: string | null
+          id?: string
+          priority?: string
+          sort_order?: number
+          template_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          checklist?: Json
+          created_at?: string
+          default_duration_minutes?: number | null
+          description?: string | null
+          id?: string
+          priority?: string
+          sort_order?: number
+          template_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_template_items_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "task_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      task_templates: {
+        Row: {
+          color: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
         }
         Relationships: []
       }
