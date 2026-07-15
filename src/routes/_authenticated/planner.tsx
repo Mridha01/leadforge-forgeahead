@@ -902,3 +902,116 @@ function TaskDialog({
     </DialogContent>
   );
 }
+
+function LoadFromListButton({
+  targetDate, userId, onLoaded, existingSortMax,
+}: { targetDate: string; userId: string | null; onLoaded: () => void; existingSortMax: number }) {
+  const [open, setOpen] = useState(false);
+  const [templateId, setTemplateId] = useState<string>("");
+  const [selected, setSelected] = useState<Record<string, boolean>>({});
+  const [busy, setBusy] = useState(false);
+
+  const { data: templates = [] } = useQuery<any[]>({
+    queryKey: ["task_templates_picker"],
+    queryFn: async () => (await supabase.from("task_templates").select("id,name,description,color").order("created_at")).data ?? [],
+    enabled: open,
+  });
+  const { data: items = [] } = useQuery<any[]>({
+    queryKey: ["task_template_items_picker", templateId],
+    enabled: !!templateId,
+    queryFn: async () => (await supabase.from("task_template_items").select("*").eq("template_id", templateId).order("sort_order")).data ?? [],
+  });
+
+  useEffect(() => {
+    if (items.length) {
+      const all: Record<string, boolean> = {};
+      items.forEach((i: any) => { all[i.id] = true; });
+      setSelected(all);
+    }
+  }, [items]);
+
+  async function loadSelected() {
+    if (!userId) return;
+    const picks = items.filter((i: any) => selected[i.id]);
+    if (picks.length === 0) { toast.error("Select at least one task"); return; }
+    setBusy(true);
+    const rows = picks.map((it: any, idx: number) => ({
+      title: it.title,
+      description: it.description,
+      priority: it.priority ?? "medium",
+      duration_minutes: it.default_duration_minutes,
+      scheduled_date: targetDate,
+      status: "pending",
+      created_by: userId,
+      sort_order: existingSortMax + idx + 1,
+      checklist: [],
+    }));
+    const { error } = await supabase.from("tasks").insert(rows as any);
+    setBusy(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success(`Loaded ${picks.length} task${picks.length > 1 ? "s" : ""} into ${dayLabel(targetDate)}`);
+    onLoaded();
+    setOpen(false); setTemplateId(""); setSelected({});
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" variant="outline" className="gap-1.5">
+          <ListTodo className="size-4" /> Load from list
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Load tasks from a list</DialogTitle>
+          <DialogDescription>
+            Pick a list, choose which tasks to add to <strong>{dayLabel(targetDate)}</strong>. Times can be set after loading.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-3">
+          <div>
+            <Label className="text-xs">List</Label>
+            <Select value={templateId} onValueChange={setTemplateId}>
+              <SelectTrigger><SelectValue placeholder={templates.length === 0 ? "No lists yet — create one first" : "Choose a list…"} /></SelectTrigger>
+              <SelectContent>
+                {templates.map((t: any) => (
+                  <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          {templateId && (
+            <div className="border border-border rounded-md max-h-72 overflow-y-auto">
+              {items.length === 0 ? (
+                <div className="p-4 text-sm text-muted-foreground text-center">This list has no tasks yet.</div>
+              ) : (
+                <ul className="divide-y divide-border">
+                  {items.map((it: any) => (
+                    <li key={it.id} className="p-2.5 flex items-start gap-2.5 hover:bg-accent/30">
+                      <Checkbox
+                        checked={!!selected[it.id]}
+                        onCheckedChange={(v) => setSelected((s) => ({ ...s, [it.id]: !!v }))}
+                        className="mt-0.5"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-sm font-medium">{it.title}</span>
+                          <Badge variant="outline" className="text-[10px]">{it.priority}</Badge>
+                          {it.default_duration_minutes && <Badge variant="outline" className="text-[10px]">{it.default_duration_minutes}m</Badge>}
+                        </div>
+                        {it.description && <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{it.description}</p>}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+        </div>
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
+          <Button onClick={loadSelected} disabled={!templateId || busy}>{busy ? "Loading…" : "Load tasks"}</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
